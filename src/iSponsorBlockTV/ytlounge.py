@@ -36,10 +36,12 @@ class YtLoungeApi(pyytlounge.YtLoungeApi):
         self.auto_play = True
         self.watchdog_running = False
         self.last_event_time = 0
+        self.subtitles_track = ""
         if config:
             self.mute_ads = config.mute_ads
             self.skip_ads = config.skip_ads
             self.auto_play = config.auto_play
+            self.subtitles_track = config.subtitles_track
         self._command_mutex = asyncio.Lock()
 
     # Ensures that we still are subscribed to the lounge
@@ -116,6 +118,9 @@ class YtLoungeApi(pyytlounge.YtLoungeApi):
             # Unmute when the video starts playing
             if self.mute_ads and data["state"] == "1":
                 create_task(self.mute(False, override=True))
+            if self.subtitles_track and data["state"] == "1":
+                # Ensure the track is set at the start of a new video
+                create_task(self.set_subtitles_track(data.get("videoId"), self.subtitles_track))
         elif event_type == "nowPlaying":
             data = args[0]
             # Unmute when the video starts playing
@@ -227,6 +232,16 @@ class YtLoungeApi(pyytlounge.YtLoungeApi):
 
     async def get_now_playing(self):
         return await self._command("getNowPlaying")
+
+    async def set_subtitles_track(self, video_id: str, language_code: str = "en") -> bool:
+        """
+        Enable subtitles for the specified video.
+        Pass an empty string to `language_code` to turn subtitles off.
+        """
+        return await self._command(
+            "setSubtitlesTrack", 
+            {"languageCode": language_code, "videoId": video_id}
+        )
 
     # Test to wrap the command function in a mutex to avoid race conditions with
     # the _command_offset (TODO: move to upstream if it works)

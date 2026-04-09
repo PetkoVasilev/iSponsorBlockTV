@@ -874,6 +874,31 @@ class ChannelWhitelistManager(Vertical):
         self.app.push_screen(AddChannel(self.config), callback=self.new_channel)
 
 
+class SubtitlesTrackManager(Vertical):
+    """Manager for subtitles track language."""
+
+    def __init__(self, config, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.config = config
+
+    def compose(self) -> ComposeResult:
+        yield Label("Subtitles Track Language", classes="title")
+        yield Label(
+            "Enter preferred subtitles track language code (e.g. 'en', or leave empty to disable)",
+            classes="subtitle",
+            id="subtitles-track-subtitle",
+        )
+        yield Input(
+            value=self.config.subtitles_track,
+            placeholder="Language code (e.g. en)",
+            id="subtitles-track-input",
+        )
+
+    @on(Input.Changed, "#subtitles-track-input")
+    def changed_subtitles_track(self, event: Input.Changed):
+        self.config.subtitles_track = event.input.value
+
+
 class AutoPlayManager(Vertical):
     """Manager for autoplay, allows enabling/disabling autoplay."""
 
@@ -970,6 +995,7 @@ class ISponsorBlockTVSetup(App):
             )
             yield ApiKeyManager(config=self.config, id="api-key-manager", classes="container")
             yield AutoPlayManager(config=self.config, id="autoplay-manager", classes="container")
+            yield SubtitlesTrackManager(config=self.config, id="subtitles-track-manager", classes="container")
             yield UseProxyManager(config=self.config, id="useproxy-manager", classes="container")
 
     def on_mount(self) -> None:
