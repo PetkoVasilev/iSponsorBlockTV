@@ -884,7 +884,11 @@ class SubtitlesTrackManager(Vertical):
     def compose(self) -> ComposeResult:
         yield Label("Subtitles Track Language", classes="title")
         yield Label(
-            "Enter preferred subtitles track language code (e.g. 'en', or leave empty to disable)",
+            (
+                "This feature allows you to set a preferred subtitles track language"
+                " code (e.g. 'en'). This feature is automatically disabled when no"
+                " language code has been specified."
+            ),
             classes="subtitle",
             id="subtitles-track-subtitle",
         )
