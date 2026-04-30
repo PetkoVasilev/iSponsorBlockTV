@@ -118,15 +118,15 @@ class YtLoungeApi(pyytlounge.YtLoungeApi):
             # Unmute when the video starts playing
             if self.mute_ads and data["state"] == "1":
                 create_task(self.mute(False, override=True))
-            if self.subtitles_track and data["state"] == "1":
-                # Ensure the track is set at the start of a new video
-                create_task(self.set_subtitles_track(data.get("videoId"), self.subtitles_track))
         elif event_type == "nowPlaying":
             data = args[0]
             # Unmute when the video starts playing
             if self.mute_ads and data.get("state", "0") == "1":
                 self.logger.info("Ad has ended, unmuting")
                 create_task(self.mute(False, override=True))
+            if self.subtitles_track and data.get("state", "0") == "1":
+                # Ensure the track is set at the start of a new video
+                create_task(self.set_subtitles_track(data.get("videoId"), self.subtitles_track))
         elif event_type == "onAdStateChange":
             data = args[0]
             if data["adState"] == "0" and data["currentTime"] != "0":  # Ad is not playing
