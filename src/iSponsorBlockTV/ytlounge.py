@@ -126,6 +126,7 @@ class YtLoungeApi(pyytlounge.YtLoungeApi):
                 create_task(self.mute(False, override=True))
             if self.subtitles_track and data.get("state", "0") == "1":
                 # Ensure the track is set at the start of a new video
+                self.logger.info(f"Setting subtitles track to {self.subtitles_track}")
                 create_task(self.set_subtitles_track(data.get("videoId"), self.subtitles_track))
         elif event_type == "onAdStateChange":
             data = args[0]
